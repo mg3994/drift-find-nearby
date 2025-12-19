@@ -2,6 +2,13 @@
     "@@locale": "hi",
     "@@author": "Manishmg3994",
     "@@comment": "This Is Hindi related Translations",
-    "@@last_modified": "{{time}}"
+    "@@last_modified": "{{time}}", 
+    "@@context": "ALL",
+    "language": "हिन्दी",
+    "langauge_flag": "🇮🇳",
+    "home": "होम",
+    "search": "खोज",
+    "quotes": "कोटेशन",
+    "profile": "प्रोफाइल"
 
 }
