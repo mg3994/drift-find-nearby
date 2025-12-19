@@ -7,6 +7,7 @@ import 'package:findnearby/core/database/app_database.dart';
 
 abstract class AppSettingsRepository {
   Signal<ThemeSetting?> get settingsSignal;
+  ReadonlySignal<bool> get isLoading;
   Future<void> updateThemeMode(ThemeMode mode);
   Future<void> updateFlexScheme(FlexScheme scheme);
   Future<void> updateFlexSchemeColor(FlexSchemeColor color);
@@ -21,9 +22,11 @@ abstract class AppSettingsRepository {
 class AppSettingsRepositoryImpl implements AppSettingsRepository {
   final AppDatabase _db;
   late final Signal<ThemeSetting?> _settingsSignal;
+  late final Signal<bool> _isLoading;
 
   AppSettingsRepositoryImpl(this._db) {
     _settingsSignal = signal<ThemeSetting?>(null);
+    _isLoading = signal<bool>(false);
     _db.watchThemeSettings().listen((data) {
       _settingsSignal.value = data;
     });
@@ -33,45 +36,78 @@ class AppSettingsRepositoryImpl implements AppSettingsRepository {
   Signal<ThemeSetting?> get settingsSignal => _settingsSignal;
 
   @override
+  ReadonlySignal<bool> get isLoading => _isLoading;
+
+  @override
   Future<void> updateThemeMode(ThemeMode mode) async {
-    await (_db.update(_db.themeSettings)..where((t) => t.id.equals(1))).write(
-      ThemeSettingsCompanion(themeMode: Value(mode)),
-    );
+    _isLoading.value = true;
+    try {
+      await (_db.update(_db.themeSettings)..where((t) => t.id.equals(1))).write(
+        ThemeSettingsCompanion(themeMode: Value(mode)),
+      );
+    } finally {
+      _isLoading.value = false;
+    }
   }
 
   @override
   Future<void> updateFlexScheme(FlexScheme scheme) async {
-    await (_db.update(_db.themeSettings)..where((t) => t.id.equals(1))).write(
-      ThemeSettingsCompanion(flexSchemeEnum: Value(scheme)),
-    );
+    _isLoading.value = true;
+    try {
+      await (_db.update(_db.themeSettings)..where((t) => t.id.equals(1))).write(
+        ThemeSettingsCompanion(flexSchemeEnum: Value(scheme)),
+      );
+    } finally {
+      _isLoading.value = false;
+    }
   }
 
   @override
   Future<void> updateFlexSchemeColor(FlexSchemeColor color) async {
-    await (_db.update(_db.themeSettings)..where((t) => t.id.equals(1))).write(
-      ThemeSettingsCompanion(flexSchemeColor: Value(color)),
-    );
+    _isLoading.value = true;
+    try {
+      await (_db.update(_db.themeSettings)..where((t) => t.id.equals(1))).write(
+        ThemeSettingsCompanion(flexSchemeColor: Value(color)),
+      );
+    } finally {
+      _isLoading.value = false;
+    }
   }
 
   @override
   Future<void> updateFontFamily(String fontFamily) async {
-    await (_db.update(_db.themeSettings)..where((t) => t.id.equals(1))).write(
-      ThemeSettingsCompanion(fontFamily: Value(fontFamily)),
-    );
+    _isLoading.value = true;
+    try {
+      await (_db.update(_db.themeSettings)..where((t) => t.id.equals(1))).write(
+        ThemeSettingsCompanion(fontFamily: Value(fontFamily)),
+      );
+    } finally {
+      _isLoading.value = false;
+    }
   }
 
   @override
   Future<void> updateLocale(String localeCode) async {
-    await (_db.update(_db.themeSettings)..where((t) => t.id.equals(1))).write(
-      ThemeSettingsCompanion(locale: Value(localeCode)),
-    );
+    _isLoading.value = true;
+    try {
+      await (_db.update(_db.themeSettings)..where((t) => t.id.equals(1))).write(
+        ThemeSettingsCompanion(locale: Value(localeCode)),
+      );
+    } finally {
+      _isLoading.value = false;
+    }
   }
 
   @override
   Future<void> updateTextScaleFactor(double factor) async {
-    await (_db.update(_db.themeSettings)..where((t) => t.id.equals(1))).write(
-      ThemeSettingsCompanion(textScaleFactor: Value(factor)),
-    );
+    _isLoading.value = true;
+    try {
+      await (_db.update(_db.themeSettings)..where((t) => t.id.equals(1))).write(
+        ThemeSettingsCompanion(textScaleFactor: Value(factor)),
+      );
+    } finally {
+      _isLoading.value = false;
+    }
   }
 
   @override

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
@@ -34,7 +35,7 @@ class MyApp extends StatelessWidget {
     final settings = settingsRepo.settingsSignal.watch(context);
 
     final themeMode = settings?.themeMode ?? ThemeMode.system;
-    final flexScheme = settings?.flexSchemeEnum ;//?? FlexScheme.material;
+    final flexScheme = settings?.flexSchemeEnum; //?? FlexScheme.material;
     final flexSchemeColor = settings?.flexSchemeColor;
     final fontBuilder = settingsRepo.getFontBuilder(settings?.fontFamily);
     final locale = settings?.locale != null
@@ -71,7 +72,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   final AppSettingsRepository settingsRepo;
   final FeatureFlagsRepository flagsRepo;
 
@@ -82,14 +83,43 @@ class SettingsScreen extends StatelessWidget {
   });
 
   @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  double? _localTextScale;
+  Timer? _debounceTimer;
+
+  @override
+  void dispose() {
+    _debounceTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final settings = settingsRepo.settingsSignal.watch(context);
-    final flags = flagsRepo.flagsSignal.watch(context);
+    final settings = widget.settingsRepo.settingsSignal.watch(context);
+    final flags = widget.flagsRepo.flagsSignal.watch(context);
+    final isSettingsLoading = widget.settingsRepo.isLoading.watch(context);
+    final isFlagsLoading = widget.flagsRepo.isLoading.watch(context);
+
+    final isLoading = isSettingsLoading || isFlagsLoading;
+
+    // Initialize local scale if it's null
+    if (_localTextScale == null && settings != null) {
+      _localTextScale = settings.textScaleFactor;
+    }
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Separate Tables & Signals'),
         centerTitle: true,
+        bottom: isLoading
+            ? const PreferredSize(
+                preferredSize: Size.fromHeight(4),
+                child: LinearProgressIndicator(),
+              )
+            : null,
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -115,7 +145,7 @@ class SettingsScreen extends StatelessWidget {
                     ],
                     selected: {settings?.themeMode ?? ThemeMode.system},
                     onSelectionChanged: (value) {
-                      settingsRepo.updateThemeMode(value.first);
+                      widget.settingsRepo.updateThemeMode(value.first);
                     },
                   ),
                 ),
@@ -126,7 +156,7 @@ class SettingsScreen extends StatelessWidget {
                     value: settings?.flexSchemeEnum ?? FlexScheme.material,
                     onChanged: (value) {
                       if (value != null) {
-                        settingsRepo.updateFlexScheme(value);
+                        widget.settingsRepo.updateFlexScheme(value);
                       }
                     },
                     items: FlexScheme.values.map((scheme) {
@@ -144,7 +174,7 @@ class SettingsScreen extends StatelessWidget {
                     value: settings?.fontFamily ?? 'Roboto',
                     onChanged: (value) {
                       if (value != null) {
-                        settingsRepo.updateFontFamily(value);
+                        widget.settingsRepo.updateFontFamily(value);
                       }
                     },
                     items: ['Roboto', 'Inter', 'Lato', 'Open Sans', 'Poppins']
@@ -164,7 +194,7 @@ class SettingsScreen extends StatelessWidget {
                     value: settings?.locale ?? 'en',
                     onChanged: (value) {
                       if (value != null) {
-                        settingsRepo.updateLocale(value);
+                        widget.settingsRepo.updateLocale(value);
                       }
                     },
                     items: AppLocalizations.supportedLocales.map((locale) {
@@ -177,19 +207,26 @@ class SettingsScreen extends StatelessWidget {
                 ),
                 ListTile(
                   title: const Text('Text Scale Factor'),
-                  subtitle: Text(
-                    (settings?.textScaleFactor ?? 1.0).toStringAsFixed(2),
-                  ),
+                  subtitle: Text((_localTextScale ?? 1.0).toStringAsFixed(2)),
                   trailing: Container(
                     width: 200,
                     child: Slider(
-                      value: settings?.textScaleFactor ?? 1.0,
+                      value: _localTextScale ?? 1.0,
                       min: 0.5,
                       max: 2.0,
                       divisions: 15,
-                      label: settings?.textScaleFactor.toStringAsFixed(2),
+                      label: (_localTextScale ?? 1.0).toStringAsFixed(2),
                       onChanged: (value) {
-                        settingsRepo.updateTextScaleFactor(value);
+                        setState(() {
+                          _localTextScale = value;
+                        });
+                        _debounceTimer?.cancel();
+                        _debounceTimer = Timer(
+                          const Duration(milliseconds: 500),
+                          () {
+                            widget.settingsRepo.updateTextScaleFactor(value);
+                          },
+                        );
                       },
                     ),
                   ),
@@ -218,7 +255,7 @@ class SettingsScreen extends StatelessWidget {
                             secondary: Colors.orange,
                             secondaryContainer: Colors.orangeAccent,
                           );
-                      settingsRepo.updateFlexSchemeColor(
+                      widget.settingsRepo.updateFlexSchemeColor(
                         current.copyWith(primary: color),
                       );
                     },
@@ -236,7 +273,7 @@ class SettingsScreen extends StatelessWidget {
                             secondary: Colors.orange,
                             secondaryContainer: Colors.orangeAccent,
                           );
-                      settingsRepo.updateFlexSchemeColor(
+                      widget.settingsRepo.updateFlexSchemeColor(
                         current.copyWith(secondary: color),
                       );
                     },
@@ -257,7 +294,7 @@ class SettingsScreen extends StatelessWidget {
                   ),
                   value: flags?.showAds ?? true,
                   onChanged: (value) {
-                    flagsRepo.toggleAds(value);
+                    widget.flagsRepo.toggleAds(value);
                   },
                 ),
                 SwitchListTile(
@@ -265,7 +302,7 @@ class SettingsScreen extends StatelessWidget {
                   subtitle: const Text('Independent of theme changes'),
                   value: flags?.showNotification ?? false,
                   onChanged: (value) {
-                    flagsRepo.toggleNotifications(value);
+                    widget.flagsRepo.toggleNotifications(value);
                   },
                 ),
               ],
