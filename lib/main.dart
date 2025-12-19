@@ -281,7 +281,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       _CustomColorGrid(
                         color:
                             settings?.flexSchemeColor ??
-                            FlexScheme.material.colors(
+                            AppTheme.defaultScheme.colors(
                               Theme.of(context).brightness,
                             ),
                         onChanged: (updatedColor) {

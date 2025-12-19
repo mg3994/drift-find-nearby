@@ -13,7 +13,7 @@ abstract final class AppTheme {
   const AppTheme._();
 
   // Default fallback scheme.
-  static const FlexScheme _defaultScheme = FlexScheme.material;
+  static const FlexScheme defaultScheme = FlexScheme.material;
 
   /// Helper to get the primary brand color based on brightness and optional custom scheme.
   static Color _getPrimaryColor({
@@ -23,9 +23,9 @@ abstract final class AppTheme {
   }) {
     if (flexSchemeEnum == FlexScheme.custom) {
       return flexSchemeColor?.primary ??
-          _defaultScheme.colors(brightness).primary;
+          defaultScheme.colors(brightness).primary;
     }
-    return (flexSchemeEnum ?? _defaultScheme).colors(brightness).primary;
+    return (flexSchemeEnum ?? defaultScheme).colors(brightness).primary;
   }
 
   /// ⚙️ Core theme builder logic for both light and dark modes.
