@@ -9,14 +9,20 @@ class AppLocalizationsHi extends AppLocalizations {
   AppLocalizationsHi([String locale = 'hi']) : super(locale);
 
   @override
-  String get home => 'Home';
+  String get language => 'हिन्दी';
 
   @override
-  String get search => 'Search';
+  String get langauge_flag => '🇮🇳';
 
   @override
-  String get quotes => 'Quotes';
+  String get home => 'होम';
 
   @override
-  String get profile => 'Profile';
+  String get search => 'खोज';
+
+  @override
+  String get quotes => 'कोटेशन';
+
+  @override
+  String get profile => 'प्रोफाइल';
 }
