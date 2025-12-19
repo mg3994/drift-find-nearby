@@ -32,28 +32,28 @@ class $ThemeSettingsTable extends ThemeSettings
         requiredDuringInsert: false,
         defaultValue: const Constant(0),
       ).withConverter<ThemeMode>($ThemeSettingsTable.$converterthemeMode);
-  static const VerificationMeta _flexSchemeEnumMeta = const VerificationMeta(
-    'flexSchemeEnum',
-  );
   @override
-  late final GeneratedColumn<int> flexSchemeEnum = GeneratedColumn<int>(
-    'flex_scheme_enum',
-    aliasedName,
-    true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _flexSchemeColorMeta = const VerificationMeta(
-    'flexSchemeColor',
-  );
+  late final GeneratedColumnWithTypeConverter<FlexScheme, int> flexSchemeEnum =
+      GeneratedColumn<int>(
+        'flex_scheme_enum',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: false,
+        defaultValue: const Constant(0),
+      ).withConverter<FlexScheme>($ThemeSettingsTable.$converterflexSchemeEnum);
   @override
-  late final GeneratedColumn<String> flexSchemeColor = GeneratedColumn<String>(
-    'flex_scheme_color',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
+  late final GeneratedColumnWithTypeConverter<FlexSchemeColor?, String>
+  flexSchemeColor =
+      GeneratedColumn<String>(
+        'flex_scheme_color',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      ).withConverter<FlexSchemeColor?>(
+        $ThemeSettingsTable.$converterflexSchemeColorn,
+      );
   static const VerificationMeta _fontFamilyMeta = const VerificationMeta(
     'fontFamily',
   );
@@ -113,24 +113,6 @@ class $ThemeSettingsTable extends ThemeSettings
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
-    if (data.containsKey('flex_scheme_enum')) {
-      context.handle(
-        _flexSchemeEnumMeta,
-        flexSchemeEnum.isAcceptableOrUnknown(
-          data['flex_scheme_enum']!,
-          _flexSchemeEnumMeta,
-        ),
-      );
-    }
-    if (data.containsKey('flex_scheme_color')) {
-      context.handle(
-        _flexSchemeColorMeta,
-        flexSchemeColor.isAcceptableOrUnknown(
-          data['flex_scheme_color']!,
-          _flexSchemeColorMeta,
-        ),
-      );
-    }
     if (data.containsKey('font_family')) {
       context.handle(
         _fontFamilyMeta,
@@ -171,13 +153,17 @@ class $ThemeSettingsTable extends ThemeSettings
           data['${effectivePrefix}theme_mode'],
         )!,
       ),
-      flexSchemeEnum: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}flex_scheme_enum'],
+      flexSchemeEnum: $ThemeSettingsTable.$converterflexSchemeEnum.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}flex_scheme_enum'],
+        )!,
       ),
-      flexSchemeColor: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}flex_scheme_color'],
+      flexSchemeColor: $ThemeSettingsTable.$converterflexSchemeColorn.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}flex_scheme_color'],
+        ),
       ),
       fontFamily: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
@@ -201,20 +187,26 @@ class $ThemeSettingsTable extends ThemeSettings
 
   static TypeConverter<ThemeMode, int> $converterthemeMode =
       const ThemeModeConverter();
+  static TypeConverter<FlexScheme, int> $converterflexSchemeEnum =
+      const FlexSchemeConverter();
+  static TypeConverter<FlexSchemeColor, String> $converterflexSchemeColor =
+      const FlexSchemeColorConverter();
+  static TypeConverter<FlexSchemeColor?, String?> $converterflexSchemeColorn =
+      NullAwareTypeConverter.wrap($converterflexSchemeColor);
 }
 
 class ThemeSetting extends DataClass implements Insertable<ThemeSetting> {
   final int id;
   final ThemeMode themeMode;
-  final int? flexSchemeEnum;
-  final String? flexSchemeColor;
+  final FlexScheme flexSchemeEnum;
+  final FlexSchemeColor? flexSchemeColor;
   final String fontFamily;
   final double textScaleFactor;
   final String locale;
   const ThemeSetting({
     required this.id,
     required this.themeMode,
-    this.flexSchemeEnum,
+    required this.flexSchemeEnum,
     this.flexSchemeColor,
     required this.fontFamily,
     required this.textScaleFactor,
@@ -229,11 +221,15 @@ class ThemeSetting extends DataClass implements Insertable<ThemeSetting> {
         $ThemeSettingsTable.$converterthemeMode.toSql(themeMode),
       );
     }
-    if (!nullToAbsent || flexSchemeEnum != null) {
-      map['flex_scheme_enum'] = Variable<int>(flexSchemeEnum);
+    {
+      map['flex_scheme_enum'] = Variable<int>(
+        $ThemeSettingsTable.$converterflexSchemeEnum.toSql(flexSchemeEnum),
+      );
     }
     if (!nullToAbsent || flexSchemeColor != null) {
-      map['flex_scheme_color'] = Variable<String>(flexSchemeColor);
+      map['flex_scheme_color'] = Variable<String>(
+        $ThemeSettingsTable.$converterflexSchemeColorn.toSql(flexSchemeColor),
+      );
     }
     map['font_family'] = Variable<String>(fontFamily);
     map['text_scale_factor'] = Variable<double>(textScaleFactor);
@@ -245,9 +241,7 @@ class ThemeSetting extends DataClass implements Insertable<ThemeSetting> {
     return ThemeSettingsCompanion(
       id: Value(id),
       themeMode: Value(themeMode),
-      flexSchemeEnum: flexSchemeEnum == null && nullToAbsent
-          ? const Value.absent()
-          : Value(flexSchemeEnum),
+      flexSchemeEnum: Value(flexSchemeEnum),
       flexSchemeColor: flexSchemeColor == null && nullToAbsent
           ? const Value.absent()
           : Value(flexSchemeColor),
@@ -265,8 +259,10 @@ class ThemeSetting extends DataClass implements Insertable<ThemeSetting> {
     return ThemeSetting(
       id: serializer.fromJson<int>(json['id']),
       themeMode: serializer.fromJson<ThemeMode>(json['themeMode']),
-      flexSchemeEnum: serializer.fromJson<int?>(json['flexSchemeEnum']),
-      flexSchemeColor: serializer.fromJson<String?>(json['flexSchemeColor']),
+      flexSchemeEnum: serializer.fromJson<FlexScheme>(json['flexSchemeEnum']),
+      flexSchemeColor: serializer.fromJson<FlexSchemeColor?>(
+        json['flexSchemeColor'],
+      ),
       fontFamily: serializer.fromJson<String>(json['fontFamily']),
       textScaleFactor: serializer.fromJson<double>(json['textScaleFactor']),
       locale: serializer.fromJson<String>(json['locale']),
@@ -278,8 +274,8 @@ class ThemeSetting extends DataClass implements Insertable<ThemeSetting> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'themeMode': serializer.toJson<ThemeMode>(themeMode),
-      'flexSchemeEnum': serializer.toJson<int?>(flexSchemeEnum),
-      'flexSchemeColor': serializer.toJson<String?>(flexSchemeColor),
+      'flexSchemeEnum': serializer.toJson<FlexScheme>(flexSchemeEnum),
+      'flexSchemeColor': serializer.toJson<FlexSchemeColor?>(flexSchemeColor),
       'fontFamily': serializer.toJson<String>(fontFamily),
       'textScaleFactor': serializer.toJson<double>(textScaleFactor),
       'locale': serializer.toJson<String>(locale),
@@ -289,17 +285,15 @@ class ThemeSetting extends DataClass implements Insertable<ThemeSetting> {
   ThemeSetting copyWith({
     int? id,
     ThemeMode? themeMode,
-    Value<int?> flexSchemeEnum = const Value.absent(),
-    Value<String?> flexSchemeColor = const Value.absent(),
+    FlexScheme? flexSchemeEnum,
+    Value<FlexSchemeColor?> flexSchemeColor = const Value.absent(),
     String? fontFamily,
     double? textScaleFactor,
     String? locale,
   }) => ThemeSetting(
     id: id ?? this.id,
     themeMode: themeMode ?? this.themeMode,
-    flexSchemeEnum: flexSchemeEnum.present
-        ? flexSchemeEnum.value
-        : this.flexSchemeEnum,
+    flexSchemeEnum: flexSchemeEnum ?? this.flexSchemeEnum,
     flexSchemeColor: flexSchemeColor.present
         ? flexSchemeColor.value
         : this.flexSchemeColor,
@@ -367,8 +361,8 @@ class ThemeSetting extends DataClass implements Insertable<ThemeSetting> {
 class ThemeSettingsCompanion extends UpdateCompanion<ThemeSetting> {
   final Value<int> id;
   final Value<ThemeMode> themeMode;
-  final Value<int?> flexSchemeEnum;
-  final Value<String?> flexSchemeColor;
+  final Value<FlexScheme> flexSchemeEnum;
+  final Value<FlexSchemeColor?> flexSchemeColor;
   final Value<String> fontFamily;
   final Value<double> textScaleFactor;
   final Value<String> locale;
@@ -413,8 +407,8 @@ class ThemeSettingsCompanion extends UpdateCompanion<ThemeSetting> {
   ThemeSettingsCompanion copyWith({
     Value<int>? id,
     Value<ThemeMode>? themeMode,
-    Value<int?>? flexSchemeEnum,
-    Value<String?>? flexSchemeColor,
+    Value<FlexScheme>? flexSchemeEnum,
+    Value<FlexSchemeColor?>? flexSchemeColor,
     Value<String>? fontFamily,
     Value<double>? textScaleFactor,
     Value<String>? locale,
@@ -442,10 +436,18 @@ class ThemeSettingsCompanion extends UpdateCompanion<ThemeSetting> {
       );
     }
     if (flexSchemeEnum.present) {
-      map['flex_scheme_enum'] = Variable<int>(flexSchemeEnum.value);
+      map['flex_scheme_enum'] = Variable<int>(
+        $ThemeSettingsTable.$converterflexSchemeEnum.toSql(
+          flexSchemeEnum.value,
+        ),
+      );
     }
     if (flexSchemeColor.present) {
-      map['flex_scheme_color'] = Variable<String>(flexSchemeColor.value);
+      map['flex_scheme_color'] = Variable<String>(
+        $ThemeSettingsTable.$converterflexSchemeColorn.toSql(
+          flexSchemeColor.value,
+        ),
+      );
     }
     if (fontFamily.present) {
       map['font_family'] = Variable<String>(fontFamily.value);
@@ -752,8 +754,8 @@ typedef $$ThemeSettingsTableCreateCompanionBuilder =
     ThemeSettingsCompanion Function({
       Value<int> id,
       Value<ThemeMode> themeMode,
-      Value<int?> flexSchemeEnum,
-      Value<String?> flexSchemeColor,
+      Value<FlexScheme> flexSchemeEnum,
+      Value<FlexSchemeColor?> flexSchemeColor,
       Value<String> fontFamily,
       Value<double> textScaleFactor,
       Value<String> locale,
@@ -762,8 +764,8 @@ typedef $$ThemeSettingsTableUpdateCompanionBuilder =
     ThemeSettingsCompanion Function({
       Value<int> id,
       Value<ThemeMode> themeMode,
-      Value<int?> flexSchemeEnum,
-      Value<String?> flexSchemeColor,
+      Value<FlexScheme> flexSchemeEnum,
+      Value<FlexSchemeColor?> flexSchemeColor,
       Value<String> fontFamily,
       Value<double> textScaleFactor,
       Value<String> locale,
@@ -789,14 +791,16 @@ class $$ThemeSettingsTableFilterComposer
         builder: (column) => ColumnWithTypeConverterFilters(column),
       );
 
-  ColumnFilters<int> get flexSchemeEnum => $composableBuilder(
+  ColumnWithTypeConverterFilters<FlexScheme, FlexScheme, int>
+  get flexSchemeEnum => $composableBuilder(
     column: $table.flexSchemeEnum,
-    builder: (column) => ColumnFilters(column),
+    builder: (column) => ColumnWithTypeConverterFilters(column),
   );
 
-  ColumnFilters<String> get flexSchemeColor => $composableBuilder(
+  ColumnWithTypeConverterFilters<FlexSchemeColor?, FlexSchemeColor, String>
+  get flexSchemeColor => $composableBuilder(
     column: $table.flexSchemeColor,
-    builder: (column) => ColumnFilters(column),
+    builder: (column) => ColumnWithTypeConverterFilters(column),
   );
 
   ColumnFilters<String> get fontFamily => $composableBuilder(
@@ -875,12 +879,14 @@ class $$ThemeSettingsTableAnnotationComposer
   GeneratedColumnWithTypeConverter<ThemeMode, int> get themeMode =>
       $composableBuilder(column: $table.themeMode, builder: (column) => column);
 
-  GeneratedColumn<int> get flexSchemeEnum => $composableBuilder(
-    column: $table.flexSchemeEnum,
-    builder: (column) => column,
-  );
+  GeneratedColumnWithTypeConverter<FlexScheme, int> get flexSchemeEnum =>
+      $composableBuilder(
+        column: $table.flexSchemeEnum,
+        builder: (column) => column,
+      );
 
-  GeneratedColumn<String> get flexSchemeColor => $composableBuilder(
+  GeneratedColumnWithTypeConverter<FlexSchemeColor?, String>
+  get flexSchemeColor => $composableBuilder(
     column: $table.flexSchemeColor,
     builder: (column) => column,
   );
@@ -932,8 +938,8 @@ class $$ThemeSettingsTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 Value<ThemeMode> themeMode = const Value.absent(),
-                Value<int?> flexSchemeEnum = const Value.absent(),
-                Value<String?> flexSchemeColor = const Value.absent(),
+                Value<FlexScheme> flexSchemeEnum = const Value.absent(),
+                Value<FlexSchemeColor?> flexSchemeColor = const Value.absent(),
                 Value<String> fontFamily = const Value.absent(),
                 Value<double> textScaleFactor = const Value.absent(),
                 Value<String> locale = const Value.absent(),
@@ -950,8 +956,8 @@ class $$ThemeSettingsTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 Value<ThemeMode> themeMode = const Value.absent(),
-                Value<int?> flexSchemeEnum = const Value.absent(),
-                Value<String?> flexSchemeColor = const Value.absent(),
+                Value<FlexScheme> flexSchemeEnum = const Value.absent(),
+                Value<FlexSchemeColor?> flexSchemeColor = const Value.absent(),
                 Value<String> fontFamily = const Value.absent(),
                 Value<double> textScaleFactor = const Value.absent(),
                 Value<String> locale = const Value.absent(),
