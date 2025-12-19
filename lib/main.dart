@@ -114,211 +114,250 @@ class _SettingsScreenState extends State<SettingsScreen> {
       appBar: AppBar(
         title: const Text('Separate Tables & Signals'),
         centerTitle: true,
-        bottom: isLoading
-            ? const PreferredSize(
-                preferredSize: Size.fromHeight(4),
-                child: LinearProgressIndicator(),
-              )
-            : null,
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
+      body: Stack(
         children: [
-          _SectionHeader(title: 'Theme Settings (Context)'),
-          Card(
-            child: Column(
-              children: [
-                ListTile(
-                  title: const Text('Theme Mode'),
-                  subtitle: Text(_themeModeName(settings?.themeMode)),
-                  trailing: SegmentedButton<ThemeMode>(
-                    segments: const [
-                      ButtonSegment(
-                        value: ThemeMode.system,
-                        label: Text('Sys'),
+          ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              _SectionHeader(title: 'Theme Settings (Context)'),
+              Card(
+                child: Column(
+                  children: [
+                    ListTile(
+                      title: const Text('Theme Mode'),
+                      subtitle: Text(_themeModeName(settings?.themeMode)),
+                      trailing: SegmentedButton<ThemeMode>(
+                        segments: const [
+                          ButtonSegment(
+                            value: ThemeMode.system,
+                            label: Text('Sys'),
+                          ),
+                          ButtonSegment(
+                            value: ThemeMode.light,
+                            label: Text('Light'),
+                          ),
+                          ButtonSegment(
+                            value: ThemeMode.dark,
+                            label: Text('Dark'),
+                          ),
+                        ],
+                        selected: {settings?.themeMode ?? ThemeMode.system},
+                        onSelectionChanged: (value) {
+                          widget.settingsRepo.updateThemeMode(value.first);
+                        },
                       ),
-                      ButtonSegment(
-                        value: ThemeMode.light,
-                        label: Text('Light'),
+                    ),
+                    ListTile(
+                      title: const Text('Theme Scheme'),
+                      subtitle: Text(
+                        settings?.flexSchemeEnum.name ?? 'Default',
                       ),
-                      ButtonSegment(value: ThemeMode.dark, label: Text('Dark')),
-                    ],
-                    selected: {settings?.themeMode ?? ThemeMode.system},
-                    onSelectionChanged: (value) {
-                      widget.settingsRepo.updateThemeMode(value.first);
-                    },
-                  ),
-                ),
-                ListTile(
-                  title: const Text('Theme Scheme'),
-                  subtitle: Text(settings?.flexSchemeEnum.name ?? 'Default'),
-                  trailing: DropdownButton<FlexScheme>(
-                    value: settings?.flexSchemeEnum ?? FlexScheme.material,
-                    onChanged: (value) {
-                      if (value != null) {
-                        widget.settingsRepo.updateFlexScheme(value);
-                      }
-                    },
-                    items: FlexScheme.values.map((scheme) {
-                      return DropdownMenuItem(
-                        value: scheme,
-                        child: Text(scheme.name),
-                      );
-                    }).toList(),
-                  ),
-                ),
-                ListTile(
-                  title: const Text('Font Family'),
-                  subtitle: Text(settings?.fontFamily ?? 'Roboto'),
-                  trailing: DropdownButton<String>(
-                    value: settings?.fontFamily ?? 'Roboto',
-                    onChanged: (value) {
-                      if (value != null) {
-                        widget.settingsRepo.updateFontFamily(value);
-                      }
-                    },
-                    items: ['Roboto', 'Inter', 'Lato', 'Open Sans', 'Poppins']
-                        .map((font) {
+                      trailing: DropdownButton<FlexScheme>(
+                        value: settings?.flexSchemeEnum ?? FlexScheme.material,
+                        onChanged: (value) {
+                          if (value != null) {
+                            widget.settingsRepo.updateFlexScheme(value);
+                          }
+                        },
+                        items: FlexScheme.values.map((scheme) {
                           return DropdownMenuItem(
-                            value: font,
-                            child: Text(font),
+                            value: scheme,
+                            child: Text(scheme.name),
                           );
-                        })
-                        .toList(),
-                  ),
-                ),
-                ListTile(
-                  title: const Text('Locale (Language)'),
-                  subtitle: Text(settings?.locale ?? 'en'),
-                  trailing: DropdownButton<String>(
-                    value: settings?.locale ?? 'en',
-                    onChanged: (value) {
-                      if (value != null) {
-                        widget.settingsRepo.updateLocale(value);
-                      }
-                    },
-                    items: AppLocalizations.supportedLocales.map((locale) {
-                      return DropdownMenuItem(
-                        value: locale.languageCode,
-                        child: Text(locale.languageCode.toUpperCase()),
-                      );
-                    }).toList(),
-                  ),
-                ),
-                ListTile(
-                  title: const Text('Text Scale Factor'),
-                  subtitle: Text((_localTextScale ?? 1.0).toStringAsFixed(2)),
-                  trailing: Container(
-                    width: 200,
-                    child: Slider(
-                      value: _localTextScale ?? 1.0,
-                      min: 0.5,
-                      max: 2.0,
-                      divisions: 15,
-                      label: (_localTextScale ?? 1.0).toStringAsFixed(2),
-                      onChanged: (value) {
-                        setState(() {
-                          _localTextScale = value;
-                        });
-                        _debounceTimer?.cancel();
-                        _debounceTimer = Timer(
-                          const Duration(milliseconds: 500),
-                          () {
-                            widget.settingsRepo.updateTextScaleFactor(value);
+                        }).toList(),
+                      ),
+                    ),
+                    ListTile(
+                      title: const Text('Font Family'),
+                      subtitle: Text(settings?.fontFamily ?? 'Roboto'),
+                      trailing: DropdownButton<String>(
+                        value: settings?.fontFamily ?? 'Roboto',
+                        onChanged: (value) {
+                          if (value != null) {
+                            widget.settingsRepo.updateFontFamily(value);
+                          }
+                        },
+                        items:
+                            [
+                              'Roboto',
+                              'Inter',
+                              'Lato',
+                              'Open Sans',
+                              'Poppins',
+                            ].map((font) {
+                              return DropdownMenuItem(
+                                value: font,
+                                child: Text(font),
+                              );
+                            }).toList(),
+                      ),
+                    ),
+                    ListTile(
+                      title: const Text('Locale (Language)'),
+                      subtitle: Text(settings?.locale ?? 'en'),
+                      trailing: DropdownButton<String>(
+                        value: settings?.locale ?? 'en',
+                        onChanged: (value) {
+                          if (value != null) {
+                            widget.settingsRepo.updateLocale(value);
+                          }
+                        },
+                        items: AppLocalizations.supportedLocales.map((locale) {
+                          return DropdownMenuItem(
+                            value: locale.languageCode,
+                            child: Text(locale.languageCode.toUpperCase()),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                    ListTile(
+                      title: const Text('Text Scale Factor'),
+                      subtitle: Text(
+                        (_localTextScale ?? 1.0).toStringAsFixed(2),
+                      ),
+                      trailing: Container(
+                        width: 200,
+                        child: Slider(
+                          value: _localTextScale ?? 1.0,
+                          min: 0.5,
+                          max: 2.0,
+                          divisions: 15,
+                          label: (_localTextScale ?? 1.0).toStringAsFixed(2),
+                          onChanged: (value) {
+                            setState(() {
+                              _localTextScale = value;
+                            });
+                            _debounceTimer?.cancel();
+                            _debounceTimer = Timer(
+                              const Duration(milliseconds: 500),
+                              () {
+                                widget.settingsRepo.updateTextScaleFactor(
+                                  value,
+                                );
+                              },
+                            );
                           },
-                        );
+                        ),
+                      ),
+                    ),
+                    if (settings?.flexSchemeEnum == FlexScheme.custom) ...[
+                      const Divider(),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        child: Text(
+                          'Custom Theme Colors',
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
+                      ),
+                      _CustomColorPicker(
+                        label: 'Primary Color',
+                        color:
+                            settings?.flexSchemeColor?.primary ?? Colors.blue,
+                        onColorChanged: (color) {
+                          final current =
+                              settings?.flexSchemeColor ??
+                              const FlexSchemeColor(
+                                primary: Colors.blue,
+                                primaryContainer: Colors.blueAccent,
+                                secondary: Colors.orange,
+                                secondaryContainer: Colors.orangeAccent,
+                              );
+                          widget.settingsRepo.updateFlexSchemeColor(
+                            current.copyWith(primary: color),
+                          );
+                        },
+                      ),
+                      _CustomColorPicker(
+                        label: 'Secondary Color',
+                        color:
+                            settings?.flexSchemeColor?.secondary ??
+                            Colors.orange,
+                        onColorChanged: (color) {
+                          final current =
+                              settings?.flexSchemeColor ??
+                              const FlexSchemeColor(
+                                primary: Colors.blue,
+                                primaryContainer: Colors.blueAccent,
+                                secondary: Colors.orange,
+                                secondaryContainer: Colors.orangeAccent,
+                              );
+                          widget.settingsRepo.updateFlexSchemeColor(
+                            current.copyWith(secondary: color),
+                          );
+                        },
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+              _SectionHeader(title: 'Feature Flags (No Context)'),
+              Card(
+                child: Column(
+                  children: [
+                    SwitchListTile(
+                      title: const Text('Show Ads'),
+                      subtitle: const Text(
+                        'Managed separately in FeatureFlags table',
+                      ),
+                      value: flags?.showAds ?? true,
+                      onChanged: (value) {
+                        widget.flagsRepo.toggleAds(value);
                       },
                     ),
-                  ),
-                ),
-                if (settings?.flexSchemeEnum == FlexScheme.custom) ...[
-                  const Divider(),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
+                    SwitchListTile(
+                      title: const Text('Show Notifications'),
+                      subtitle: const Text('Independent of theme changes'),
+                      value: flags?.showNotification ?? false,
+                      onChanged: (value) {
+                        widget.flagsRepo.toggleNotifications(value);
+                      },
                     ),
-                    child: Text(
-                      'Custom Theme Colors',
-                      style: Theme.of(context).textTheme.titleSmall,
+                  ],
+                ),
+              ),
+              const SizedBox(height: 40),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Text(
+                  'Notice: Toggling Feature Flags does not rebuild the Theme section, and vice-versa, thanks to separate Signals and Tables.',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if (isLoading)
+            Positioned.fill(
+              child: Container(
+                color: Colors.black.withOpacity(0.1),
+                child: Center(
+                  child: Card(
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: const Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          CircularProgressIndicator(),
+                          SizedBox(height: 16),
+                          Text('Updating settings...'),
+                        ],
+                      ),
                     ),
                   ),
-                  _CustomColorPicker(
-                    label: 'Primary Color',
-                    color: settings?.flexSchemeColor?.primary ?? Colors.blue,
-                    onColorChanged: (color) {
-                      final current =
-                          settings?.flexSchemeColor ??
-                          const FlexSchemeColor(
-                            primary: Colors.blue,
-                            primaryContainer: Colors.blueAccent,
-                            secondary: Colors.orange,
-                            secondaryContainer: Colors.orangeAccent,
-                          );
-                      widget.settingsRepo.updateFlexSchemeColor(
-                        current.copyWith(primary: color),
-                      );
-                    },
-                  ),
-                  _CustomColorPicker(
-                    label: 'Secondary Color',
-                    color:
-                        settings?.flexSchemeColor?.secondary ?? Colors.orange,
-                    onColorChanged: (color) {
-                      final current =
-                          settings?.flexSchemeColor ??
-                          const FlexSchemeColor(
-                            primary: Colors.blue,
-                            primaryContainer: Colors.blueAccent,
-                            secondary: Colors.orange,
-                            secondaryContainer: Colors.orangeAccent,
-                          );
-                      widget.settingsRepo.updateFlexSchemeColor(
-                        current.copyWith(secondary: color),
-                      );
-                    },
-                  ),
-                ],
-              ],
-            ),
-          ),
-          const SizedBox(height: 24),
-          _SectionHeader(title: 'Feature Flags (No Context)'),
-          Card(
-            child: Column(
-              children: [
-                SwitchListTile(
-                  title: const Text('Show Ads'),
-                  subtitle: const Text(
-                    'Managed separately in FeatureFlags table',
-                  ),
-                  value: flags?.showAds ?? true,
-                  onChanged: (value) {
-                    widget.flagsRepo.toggleAds(value);
-                  },
                 ),
-                SwitchListTile(
-                  title: const Text('Show Notifications'),
-                  subtitle: const Text('Independent of theme changes'),
-                  value: flags?.showNotification ?? false,
-                  onChanged: (value) {
-                    widget.flagsRepo.toggleNotifications(value);
-                  },
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 40),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Text(
-              'Notice: Toggling Feature Flags does not rebuild the Theme section, and vice-versa, thanks to separate Signals and Tables.',
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Theme.of(context).colorScheme.outline,
               ),
             ),
-          ),
         ],
       ),
     );
