@@ -9,14 +9,12 @@ import 'package:findnearby/core/database/tables/tables.dart';
 
 part 'app_database.g.dart';
 
-@DriftDatabase(tables: [ThemeSettings, FeatureFlags])
+@DriftDatabase(tables: [ThemeSettings, FeatureFlags, Preferences])
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
   int get schemaVersion => 1;
-
-  
 
   // -- Theme Settings Singleton Access --
   Future<ThemeSetting> getThemeSettings() async {
@@ -55,6 +53,28 @@ class AppDatabase extends _$AppDatabase {
       featureFlags,
     )..where((t) => t.id.equals(1))).watchSingleOrNull();
   }
+
+  // -- Preferences Singleton Access --
+  Future<Preference> getPreferences() async {
+    final query = select(preferences)..where((t) => t.id.equals(1));
+    final result = await query.getSingleOrNull();
+    if (result == null) {
+      await into(
+        preferences,
+      ).insert(const PreferencesCompanion(id: Value(1)));
+      return await query.getSingle();
+    }
+    return result;
+  }
+
+  Stream<Preference?> watchPreferences() {
+    return (select(
+      preferences,
+    )..where((t) => t.id.equals(1))).watchSingleOrNull();
+  }
+
+  Future<void> updatePreferences(Preference entry) =>
+      update(preferences).replace(entry);
 }
 
 QueryExecutor _openConnection() {
