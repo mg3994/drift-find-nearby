@@ -13,7 +13,6 @@
 // import 'core/repositories/preferences_repository.dart'
 //     show PreferencesRepository, PreferencesRepositoryImpl;
 
-
 import 'dart:async' show runZonedGuarded;
 
 import 'package:flutter/foundation.dart' show debugPrint;
@@ -23,8 +22,8 @@ import 'bootstrap.dart' show runAppAsync, Bootstrap;
 void main() {
   runZonedGuarded<void>(
     () {
-      runAppAsync((binding,flavorConfig) async {
-        return Bootstrap(binding: binding,flavorConfig: flavorConfig);
+      runAppAsync((binding, flavorConfig) async {
+        return Bootstrap(binding: binding, flavorConfig: flavorConfig);
       });
     },
     (error, stack) {
@@ -214,9 +213,9 @@ void main() {
 //                     ),
 //                     ListTile(
 //                       title: const Text('Font Family'),
-//                       subtitle: Text(settings?.fontFamily ?? 'Roboto'),
+//                       subtitle: Text(settings?.fontFamily ?? 'Inter'),
 //                       trailing: DropdownButton<String>(
-//                         value: settings?.fontFamily ?? 'Roboto',
+//                         value: settings?.fontFamily ?? 'Inter',
 //                         onChanged: (value) {
 //                           if (value != null) {
 //                             widget.settingsRepo.updateFontFamily(value);
@@ -224,8 +223,8 @@ void main() {
 //                         },
 //                         items:
 //                             [
-//                               'Roboto',
 //                               'Inter',
+//                               'Roboto',
 //                               'Lato',
 //                               'Open Sans',
 //                               'Poppins',

@@ -15,6 +15,8 @@ enum Flavor {
   production,
   staging;
 
+  // sorry `test` you are not here , android gradle will complain for this flavor dimension
+
   /// Returns the name of the flavor in lowercase.
   static Flavor fromString(String? value) {
     return Flavor.values.firstWhere(
@@ -51,7 +53,7 @@ abstract interface class FlavorConfig {
     // 1. If in RELEASE mode, always use the configured remoteBaseUrl.
     if (buildMode == BuildMode.release) {
       return
-      // TODO: need help here to fetch it from app_config file
+      // TODO: need help here to fetch it from app_config file < confused why serverpod is doing this
       jsonUrl ?? remoteBaseUrl;
     }
 

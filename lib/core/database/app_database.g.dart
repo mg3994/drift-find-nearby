@@ -64,7 +64,7 @@ class $ThemeSettingsTable extends ThemeSettings
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: false,
-    defaultValue: const Constant('Roboto'),
+    defaultValue: const Constant('Inter'),
   );
   static const VerificationMeta _textScaleFactorMeta = const VerificationMeta(
     'textScaleFactor',

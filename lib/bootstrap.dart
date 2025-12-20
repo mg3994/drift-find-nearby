@@ -83,7 +83,7 @@ class _BootstrapState extends State<Bootstrap> {
 
     return MaterialApp.router(
       onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
-      routerConfig: routerConfig,
+      // routerConfig: routerConfig,
       themeMode: themeMode,
       theme: AppTheme.light(
         flexSchemeEnum: flexScheme,

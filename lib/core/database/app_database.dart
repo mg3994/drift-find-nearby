@@ -12,13 +12,13 @@ part 'app_database.g.dart';
 
 @DriftDatabase(tables: [ThemeSettings, FeatureFlags, Preferences, UserPresence])
 class AppDatabase extends _$AppDatabase {
-  AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
+  AppDatabase._([QueryExecutor? executor]) : super(executor ?? _openConnection());
   AppDatabase.forTesting(DatabaseConnection super.connection);
 
   static Signal<AppDatabase>? _instance;
   static final Signal<AppDatabase> instance = () {
     if (_instance == null) {
-      final db = AppDatabase();
+      final db = AppDatabase._();
       _instance = signal(db)..onDispose(db.close);
     }
     return _instance!;
