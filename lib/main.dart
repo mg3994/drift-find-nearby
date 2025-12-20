@@ -7,6 +7,9 @@ import 'package:findnearby/core/database/app_database.dart';
 import 'package:findnearby/core/repositories/app_settings_repository.dart';
 import 'package:findnearby/core/repositories/feature_flags_repository.dart';
 import 'package:findnearby/l10n/app_localizations.dart';
+import 'package:findnearby/core/repositories/user_presence_repository.dart';
+import 'core/repositories/preferences_repository.dart'
+    show PreferencesRepository, PreferencesRepositoryImpl;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,7 +22,21 @@ void main() async {
 
   final AppSettingsRepository settingsRepo = AppSettingsRepositoryImpl(db);
   final FeatureFlagsRepository flagsRepo = FeatureFlagsRepositoryImpl(db);
+  final PreferencesRepository preferencesRepo = PreferencesRepositoryImpl(db);
+  final UserPresenceRepository userPresenceRepo = UserPresenceRepositoryImpl(
+    db,
+  );
 
+  // print(
+  //   await userPresenceRepo.userPresence.then(
+  //     (value) => value.isOnline,
+  //   ),
+  // );
+  // print(
+  //   await preferencesRepo.preferences.then(
+  //     (value) => value.isOnboardingCompleted,
+  //   ),
+  // );
   runApp(MyApp(settingsRepo: settingsRepo, flagsRepo: flagsRepo));
 }
 
