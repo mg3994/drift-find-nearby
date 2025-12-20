@@ -6,21 +6,26 @@ import '../database/app_database.dart'
 
 abstract class PreferencesRepository {
   const PreferencesRepository();
-  Future<Preference> get preferences;
+  Signal<Preference?> get preferencesSignal;
   ReadonlySignal<bool> get isLoading;
   Future<void> completeOnboarding();
 }
 
 class PreferencesRepositoryImpl implements PreferencesRepository {
   final AppDatabase _db;
+  late final Signal<Preference?> _preferencesSignal;
   late final Signal<bool> _isLoading;
 
   PreferencesRepositoryImpl(this._db) {
+    _preferencesSignal = signal<Preference?>(null);
     _isLoading = signal<bool>(false);
+    _db.watchPreferences().listen((data) {
+      _preferencesSignal.value = data;
+    });
   }
 
   @override
-  Future<Preference> get preferences => _db.getPreferences();
+  Signal<Preference?> get preferencesSignal => _preferencesSignal;
 
   @override
   ReadonlySignal<bool> get isLoading => _isLoading;

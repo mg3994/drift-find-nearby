@@ -65,16 +65,17 @@ class AppDatabase extends _$AppDatabase {
     return result;
   }
 
-  // Stream<Preference?> watchPreferences() {
-  //   return (select(
-  //     preferences,
-  //   )..where((t) => t.id.equals(1))).watchSingleOrNull();
-  // }
+  Stream<Preference?> watchPreferences() {
+    return (select(
+      preferences,
+    )..where((t) => t.id.equals(1))).watchSingleOrNull();
+  }
 
   Future<void> updatePreferences(Preference entry) =>
       update(preferences).replace(entry);
 
   // -- User Presence Singleton Access --
+  //  watch
   Future<UserPresenceData> getUserPresence() async {
     final query = select(userPresence)..where((t) => t.id.equals(1));
     final result = await query.getSingleOrNull();
@@ -85,6 +86,12 @@ class AppDatabase extends _$AppDatabase {
       return await query.getSingle();
     }
     return result;
+  }
+
+  Stream<UserPresenceData?> watchUserPresence() {
+    return (select(
+      userPresence,
+    )..where((t) => t.id.equals(1))).watchSingleOrNull();
   }
 }
 

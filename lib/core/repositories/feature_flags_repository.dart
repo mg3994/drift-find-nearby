@@ -44,6 +44,7 @@ class FeatureFlagsRepositoryImpl implements FeatureFlagsRepository {
   Future<void> toggleNotifications(bool show) async {
     _isLoading.value = true;
     try {
+      //TODO: Persmission handler  check status then if we are able to show notification then update the database
       await (_db.update(_db.featureFlags)..where((t) => t.id.equals(1))).write(
         FeatureFlagsCompanion(showNotification: Value(show)),
       );

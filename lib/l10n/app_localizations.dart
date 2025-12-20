@@ -95,6 +95,12 @@ abstract class AppLocalizations {
     Locale('hi')
   ];
 
+  /// No description provided for @appTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'FindNearby'**
+  String get appTitle;
+
   /// No description provided for @language.
   ///
   /// In en, this message translates to:

@@ -4,8 +4,10 @@
     "@@comment": "This Is English Related Translations",
     "@@last_modified": "{{time}}",
     "@@context": "ALL",
+    "appTitle": "FindNearby",
     "language": "English",
     "langauge_flag": "🇺🇸",
+
     "home": "Home",
     "search": "Search",
     "quotes": "Quotes",
