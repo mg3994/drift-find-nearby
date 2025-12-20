@@ -1,7 +1,7 @@
 import 'package:drift/drift.dart';
 
-class UserPresence extends Table {
-  IntColumn get id => integer().autoIncrement()();
-  BoolColumn get isOnline =>
-      boolean().withDefault(const Constant(true))();
+import '../utils/utils.dart' show AutoIncrementingPrimaryKey;
+
+class UserPresence extends Table with AutoIncrementingPrimaryKey {
+  BoolColumn get isOnline => boolean().withDefault(const Constant(true))();
 }

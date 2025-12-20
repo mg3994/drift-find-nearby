@@ -6,12 +6,23 @@ import 'package:flutter/material.dart' show ThemeMode;
 import 'package:path_provider/path_provider.dart';
 
 import 'package:findnearby/core/database/tables/tables.dart';
+import 'package:signals/signals_flutter.dart';
 
 part 'app_database.g.dart';
 
 @DriftDatabase(tables: [ThemeSettings, FeatureFlags, Preferences, UserPresence])
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
+  AppDatabase.forTesting(DatabaseConnection super.connection);
+
+  static Signal<AppDatabase>? _instance;
+  static final Signal<AppDatabase> instance = () {
+    if (_instance == null) {
+      final db = AppDatabase();
+      _instance = signal(db)..onDispose(db.close);
+    }
+    return _instance!;
+  }();
 
   @override
   int get schemaVersion => 1;

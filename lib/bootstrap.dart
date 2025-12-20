@@ -42,7 +42,7 @@ class Bootstrap extends StatefulWidget {
 }
 
 class _BootstrapState extends State<Bootstrap> {
-  static final AppDatabase db = AppDatabase();
+  static final AppDatabase db = AppDatabase.instance();
   final AppSettingsRepository settingsRepo = AppSettingsRepositoryImpl(db);
   final FeatureFlagsRepository flagsRepo = FeatureFlagsRepositoryImpl(db);
   final PreferencesRepository preferencesRepo = PreferencesRepositoryImpl(db);

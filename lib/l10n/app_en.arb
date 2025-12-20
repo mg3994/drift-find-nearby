@@ -5,9 +5,11 @@
     "@@last_modified": "{{time}}",
     "@@context": "ALL",
     "appTitle": "FindNearby",
+    "@appTitle": {
+        "description": "The title of the application"
+    },
     "language": "English",
     "langauge_flag": "🇺🇸",
-
     "home": "Home",
     "search": "Search",
     "quotes": "Quotes",
