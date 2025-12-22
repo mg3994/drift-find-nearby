@@ -3,7 +3,7 @@ import 'package:drift_flutter/drift_flutter.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' show ThemeMode;
-import 'package:flutter/widgets.dart' show Locale;
+
 import 'package:path_provider/path_provider.dart';
 
 import 'package:findnearby/core/database/tables/tables.dart';
