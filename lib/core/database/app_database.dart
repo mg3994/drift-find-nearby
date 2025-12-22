@@ -3,10 +3,13 @@ import 'package:drift_flutter/drift_flutter.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' show ThemeMode;
+import 'package:flutter/widgets.dart' show Locale;
 import 'package:path_provider/path_provider.dart';
 
 import 'package:findnearby/core/database/tables/tables.dart';
 import 'package:signals/signals_flutter.dart';
+
+import '../../l10n/app_localizations.dart' show AppLocalizations;
 
 part 'app_database.g.dart';
 
@@ -32,9 +35,21 @@ class AppDatabase extends _$AppDatabase {
     final query = select(themeSettings)..where((t) => t.id.equals(1));
     final result = await query.getSingleOrNull();
     if (result == null) {
+      // 1. Get the device language code
+String deviceLocaleCode = PlatformDispatcher.instance.locale.languageCode;
+
+// 2. Get the list of supported Locales
+final supported = AppLocalizations.supportedLocales;
+
+// 3. Find the first supported locale that matches the device locale
+String locale = supported.firstWhere(
+  (locale) => locale.languageCode == deviceLocaleCode,
+  orElse: () => supported.first,
+).languageCode;
+
       await into(
         themeSettings,
-      ).insert(const ThemeSettingsCompanion(id: Value(1)));
+      ).insert( ThemeSettingsCompanion(id: const Value(1), locale: Value(locale)));
       return await query.getSingle();
     }
     return result;

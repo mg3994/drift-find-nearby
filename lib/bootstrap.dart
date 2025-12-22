@@ -74,7 +74,8 @@ class _BootstrapState extends State<Bootstrap> {
     final settings = settingsRepo.settingsSignal.watch(context);
 
     final themeMode = settings?.themeMode ?? ThemeMode.system;
-    final flexScheme = settings?.flexSchemeEnum; //?? FlexScheme.material;
+    final flexScheme = settings
+        ?.flexSchemeEnum; //?? FlexScheme.material; // No need AppTheme will handle fallback case
     final flexSchemeColor = settings?.flexSchemeColor;
     final fontBuilder = settingsRepo.getFontBuilder(settings?.fontFamily);
     final locale = settings?.locale != null
